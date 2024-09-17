@@ -13,7 +13,11 @@ class PostController extends Controller
     public function index()
     {
         //
-        $posts = Post::query()->orderBy('created_at', 'desc')->paginate(30);
+        $posts = Post::query()
+        ->where('user_id', request()->user()->id)
+        ->orderBy('created_at', 'desc')
+        ->paginate(30);
+
         return view('post.index', ['posts' => $posts]);
     }
 
@@ -36,7 +40,8 @@ class PostController extends Controller
             'content' => 'required|min:3',
         ]);
 
-        $data['user_id'] = 1; //hardcoded for now. In the future, we will use the authenticated user.
+        #$data['user_id'] = 1; //hardcoded for now. In the future, we will use the authenticated user.
+        $data['user_id'] = $request->user()->id;
 
         $post = Post::create($data);
         
@@ -57,6 +62,11 @@ class PostController extends Controller
     public function show(Post $post)
     {
         //
+        if ($post->user_id != request()->user()->id) 
+        {
+            abort(403);
+        }
+
         $post = Post::query()->findOrFail($post->id);
         return view('post.show', ['post' => $post]);
     }
