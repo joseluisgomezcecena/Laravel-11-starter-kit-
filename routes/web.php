@@ -18,3 +18,4 @@ Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.
 */
 
 Route::resource('posts', PostController::class);
+Route::get('/posts/{post}/delete', [PostController::class, 'delete'])->name('posts.delete');//custom route for delete confirmation.

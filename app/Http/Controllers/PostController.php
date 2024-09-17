@@ -36,15 +36,17 @@ class PostController extends Controller
             'content' => 'required|min:3',
         ]);
 
+        $data['user_id'] = 1; //hardcoded for now. In the future, we will use the authenticated user.
+
         $post = Post::create($data);
         
         if ($post) 
         {
-            return to_route('posts.show', $post)->with('success', 'Post created successfully');
+            return to_route('posts.show', $post)->with('message', 'Post created successfully');
         } 
         else 
         {
-            return back()->with('error', 'Post was not created');
+            return back()->with('message', 'Post was not created');
         }
         
     }
@@ -65,6 +67,8 @@ class PostController extends Controller
     public function edit(Post $post)
     {
         //
+        
+        return view('post.edit', ['post' => $post]);
     }
 
     /**
@@ -73,7 +77,33 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         //
+        $data = $request->validate([
+            'content' => 'required|min:3',
+        ]);
+
+        $post->update($data);
+
+        if ($post) 
+        {
+            return to_route('posts.show', $post)->with('message', 'Post updated successfully.');
+        } 
+        else 
+        {
+            return back()->with('message', 'Post was not created');
+        }
+        
     }
+
+    /**
+     * Delete confirmation view..
+     */
+    public function delete(Post $post)
+    {
+        //
+        return view('post.delete', ['post' => $post]);
+    }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -81,5 +111,8 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         //
+        $post->delete();
+
+        return to_route('posts.index')->with('message', 'Post deleted successfully.');
     }
 }
